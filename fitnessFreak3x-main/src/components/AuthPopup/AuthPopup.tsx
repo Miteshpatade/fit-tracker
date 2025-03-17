@@ -18,6 +18,7 @@ const BACKEND_API = process.env.NEXT_PUBLIC_BACKEND_API || "http://localhost:800
 
 interface AuthPopupProps {
   setShowpopup: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsloggedin?: React.Dispatch<React.SetStateAction<boolean>>; // Added prop for login state
 }
 
 interface SignupFormData {
@@ -32,7 +33,7 @@ interface SignupFormData {
   activityLevel: string;
 }
 
-const AuthPopup: React.FC<AuthPopupProps> = ({ setShowpopup }) => {
+const AuthPopup: React.FC<AuthPopupProps> = ({ setShowpopup, setIsloggedin }) => {
   const [showSignup, setShowSignup] = useState<boolean>(false);
   const [signupformData, setSignupFormData] = useState<SignupFormData>({
     name: "",
@@ -59,7 +60,8 @@ const AuthPopup: React.FC<AuthPopupProps> = ({ setShowpopup }) => {
     }
 
     try {
-      const response = await fetch(`http://localhost:8000/auth/login`, {
+      console.log(JSON.stringify(loginformData))
+      const response = await fetch(`${BACKEND_API}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(loginformData),
@@ -71,6 +73,11 @@ const AuthPopup: React.FC<AuthPopupProps> = ({ setShowpopup }) => {
 
       if (!response.ok) throw new Error(data.message || "Login failed");
 
+      // Update login state in parent component
+      if (setIsloggedin) {
+        setIsloggedin(true);
+      }
+      
       toast.success("✅ Login successful!");
       setShowpopup(false);
     } catch (error: any) {

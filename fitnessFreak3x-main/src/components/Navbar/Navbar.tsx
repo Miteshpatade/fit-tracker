@@ -6,6 +6,7 @@ import "./Navbar.css";
 import Image from "next/image";
 import Link from "next/link";
 import AuthPopup from "../AuthPopup/AuthPopup";
+import { toast } from "react-toastify";
 
 const Navbar = () => {
     const [isloggedin, setIsloggedin] = React.useState<boolean>(false);
@@ -52,12 +53,35 @@ const Navbar = () => {
         }
     };
 
+    // ✅ Handle Logout Function
+    const handleLogout = async () => {
+        try {
+            const response = await fetch(`${BACKEND_API}/auth/logout`, {
+                method: "POST",
+                credentials: "include",
+            });
+            
+            // Clear the cookie even if the API call fails
+            document.cookie = "authToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+            setIsloggedin(false);
+            
+            if (response.ok) {
+                toast.success("Logged out successfully");
+            }
+        } catch (error) {
+            console.error("Logout error:", error);
+            // Still clear the cookie and state
+            document.cookie = "authToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+            setIsloggedin(false);
+        }
+    };
+
     // ✅ Use Effect to Run on Mount
     React.useEffect(() => {
         if (checkAuthToken()) {
             checkLogin();
         }
-    }, []); // ✅ Runs once when component mounts
+    }, [showpopup]); // Run when component mounts and when popup is closed
 
     return (
         <nav>
@@ -68,12 +92,12 @@ const Navbar = () => {
                 <IoIosBody />
             </Link>
             {isloggedin ? (
-                <button>Logout</button>
+                <button onClick={handleLogout}>Logout</button>
             ) : (
                 <button onClick={() => setShowpopup(true)}>Login</button>
             )}
 
-            {showpopup && <AuthPopup setShowpopup={setShowpopup} />}
+            {showpopup && <AuthPopup setShowpopup={setShowpopup} setIsloggedin={setIsloggedin} />}
         </nav>
     );
 };
