@@ -140,7 +140,9 @@ userSchema.pre('save', async function (next) {
 
     // Only hash the password if it's been modified
     if (user.isModified('password')) {
+        console.log("🛑 Raw password before hashing:", user.password);
         user.password = await bcrypt.hash(user.password, 8);
+        console.log("✅ Hashed password after hashing:", user.password);
     }
 
     next();

@@ -68,6 +68,7 @@ router.post('/register', async (req, res, next) => {
 router.post('/login', async (req, res, next) => {
     try {
         const { email, password } = req.body;
+        console.log(req.body);
         const user = await User.findOne({ email: email.toLowerCase() });
 
         if (!user) {
@@ -80,10 +81,12 @@ router.post('/login', async (req, res, next) => {
 
         // Compare password
         const isPasswordValid = await bcrypt.compare(password, user.password);
+        console.log('🔍 Password comparison result:', isPasswordValid); // Add this log
 
         if (!isPasswordValid) {
             return res.status(401).json(createResponse(false, "❌ Invalid credentials"));
         }
+
 
         // Generate JWT Tokens
         const authToken = jwt.sign({ userId: user._id }, process.env.JWT_SECRET_KEY, { expiresIn: '1h' });

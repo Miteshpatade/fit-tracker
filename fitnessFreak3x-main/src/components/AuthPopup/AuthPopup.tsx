@@ -59,7 +59,7 @@ const AuthPopup: React.FC<AuthPopupProps> = ({ setShowpopup }) => {
     }
 
     try {
-      const response = await fetch(`${BACKEND_API}/auth/login`, {
+      const response = await fetch(`http://localhost:8000/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(loginformData),
